@@ -13,28 +13,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-apiVersion: v2
-name: skywalking-helm
-home: https://skywalking.apache.org
-version: 4.4.3
-description: Helm Chart for Apache SkyWalking
-icon: https://raw.githubusercontent.com/apache/skywalking-kubernetes/master/logo/sw-logo-for-chart.jpg
-sources:
-  - https://github.com/apache/skywalking-kubernetes
-maintainers:
-  - name: hanahmily
-    email: hanahmily@gmail.com
-  - name: innerpeacez
-    email: innerpeace.zhai@gmail.com
-  - name: kezhenxu94
-    email: kezhenxu94@163.com
-
-dependencies:
-  - name: elasticsearch
-    version: ~7.17.1
-    repository: https://helm.elastic.co/
-    condition: elasticsearch.enabled
-  - name: postgresql
-    version: 12.1.2
-    repository: https://raw.githubusercontent.com/bitnami/charts/archive-full-index/bitnami
-    condition: postgresql.enabled
+{{- if .Values.oap.configExt }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "skywalking.fullname" . }}-oap-cm-ext
+  labels:
+    app: {{ template "skywalking.name" . }}
+    release: {{ .Release.Name }}
+    component: {{ .Values.oap.name }}
+data:
+{{- range $path, $config := .Values.oap.configExt }}
+ {{- if typeIs "string" $config }}
+ {{ $path }}: |
+{{ $config | indent 4 }}
+ {{- else }}
+  {{- range $subpath, $subconfig := $config }}
+ {{ print $path "-" $subpath }}: |
+{{ $subconfig | indent 4 }}
+  {{- end }}
+ {{- end }}
+{{- end }}
+{{ end }}

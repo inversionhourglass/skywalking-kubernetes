@@ -96,6 +96,10 @@ oap:
     #   <Configuration status="DEBUG">
     #     <!-- ... -->
     #   </Configuration>
+  configExt: {}
+    # oal:
+    #   core.oal: |
+    #     service_failure_count = from(Service.*).count(status != true);
 
 
 ui:

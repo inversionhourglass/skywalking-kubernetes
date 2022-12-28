@@ -148,3 +148,32 @@ Create the name of the service account to use for the satellite cluster
   value: "{{ .Values.postgresql.auth.password }}"
 {{- end }}
 {{- end -}}
+
+{{- define "skywalking.containers.ext-config-merge" -}}
+{{- if .Values.oap.configExt }}
+- name: ext-config-merge
+  image: {{ .Values.oap.image.repository }}:{{ .Values.oap.image.tag }}
+  imagePullPolicy: IfNotPresent
+  command:
+    - sh
+    - -c
+    - |
+      cd config && find . -name *.ext | xargs -I {} sh -c 'mkdir -p "../ext-config/${1%/*}"; cp "${1%.ext}" "../ext-config/${1%.ext}"; cat "$1" >> "../ext-config/${1%.ext}";' - '{}'
+  volumeMounts:
+    - name: skywalking-oap-ext-config
+      mountPath: /skywalking/ext-config
+    {{- range $path, $config := .Values.oap.configExt }}
+    {{- if typeIs "string" $config }}
+    - name: skywalking-oap-ext-merge
+      mountPath: /skywalking/config/{{ $path }}.ext
+      subPath: {{ $path }}
+    {{- else }}
+    {{- range $subpath, $oalContent := $config }}
+    - name: skywalking-oap-ext-merge
+      mountPath: /skywalking/config/{{ $path }}/{{ $subpath }}.ext
+      subPath: {{ print $path "-" $subpath }}
+    {{- end }}
+    {{- end }}
+    {{- end -}}
+{{- end -}}
+{{- end -}}

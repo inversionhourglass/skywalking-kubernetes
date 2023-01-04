@@ -36,8 +36,9 @@ spec:
         app: {{ template "skywalking.name" . }}
         component: "{{ .Values.oap.name }}"
         release: {{ .Release.Name }}
-        {{- if .Values.oap.podAnnotations }}
       annotations:
+        rollme: {{ randAlphaNum 5 | quote }}
+        {{- if .Values.oap.podAnnotations }}
 {{ toYaml .Values.oap.podAnnotations | indent 8 }}
         {{- end }}
     spec:

@@ -55,12 +55,24 @@ Create a oap full labels value.
 app={{ template "skywalking.name" . }},release={{ .Release.Name }},component={{ .Values.oap.name }}
 {{- end -}}
 
+{{- define "skywalking.oap.manager.labels" -}}
+app={{ template "skywalking.name" . }},release={{ .Release.Name }},component={{ .Values.oap.manager.name }}
+{{- end -}}
+
 {{/*
 Create a default fully qualified ui name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 */}}
 {{- define "skywalking.ui.fullname" -}}
 {{ template "skywalking.fullname" . }}-{{ .Values.ui.name }}
+{{- end -}}
+
+{{- define "skywalking.oap.manager.fullname" -}}
+{{ template "skywalking.fullname" . }}-{{ .Values.oap.manager.name }}
+{{- end -}}
+
+{{- define "skywalking.ui.manager.fullname" -}}
+{{ template "skywalking.fullname" . }}-{{ .Values.ui.manager.name }}
 {{- end -}}
 
 {{/*

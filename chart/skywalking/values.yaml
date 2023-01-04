@@ -99,7 +99,29 @@ oap:
   configExt: {}
     # oal:
     #   core.oal: |
-    #     service_failure_count = from(Service.*).count(status != true);
+    #     service_failure_count = from(Service.*).filter(status != true).count();
+  manager:
+    enabled: false
+    name: oap-manager
+    dynamicConfigEnabled: false
+    storageType: null
+    ports:
+      rest: 12800
+    service:
+      type: ClusterIP
+    javaOpts: -Xmx2g -Xms2g
+    antiAffinity: "soft"
+    nodeAffinity: {}
+    nodeSelector: {}
+    tolerations: []
+    resources: {}
+    livenessProbe: {}
+    readinessProbe: {}
+    securityContext: {}
+    envoy:
+      als:
+        enabled: false
+    env:
 
 
 ui:
@@ -154,6 +176,23 @@ ui:
     # runAsUser: 1000
     # runAsGroup: 1000
     # fsGroup: 1000
+  manager:
+    name: ui-manager
+    nodeAffinity: {}
+    nodeSelector: {}
+    tolerations: []
+    ingress:
+      enabled: false
+      annotations: {}
+      path: /
+      hosts: []
+      tls: []
+    service:
+      type: ClusterIP
+      externalPort: 80
+      internalPort: 8080
+      annotations: {}
+    securityContext: {}
 
 oapInit:
   nodeAffinity: {}

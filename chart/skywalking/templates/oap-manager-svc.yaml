@@ -13,28 +13,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-apiVersion: v2
-name: skywalking-helm
-home: https://skywalking.apache.org
-version: 4.4.4
-description: Helm Chart for Apache SkyWalking
-icon: https://raw.githubusercontent.com/apache/skywalking-kubernetes/master/logo/sw-logo-for-chart.jpg
-sources:
-  - https://github.com/apache/skywalking-kubernetes
-maintainers:
-  - name: hanahmily
-    email: hanahmily@gmail.com
-  - name: innerpeacez
-    email: innerpeace.zhai@gmail.com
-  - name: kezhenxu94
-    email: kezhenxu94@163.com
-
-dependencies:
-  - name: elasticsearch
-    version: ~7.17.1
-    repository: https://helm.elastic.co/
-    condition: elasticsearch.enabled
-  - name: postgresql
-    version: 12.1.2
-    repository: https://raw.githubusercontent.com/bitnami/charts/archive-full-index/bitnami
-    condition: postgresql.enabled
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "skywalking.oap.manager.fullname" . }}
+  labels:
+    app: {{ template "skywalking.name" . }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    component: "{{ .Values.oap.manager.name }}"
+    heritage: {{ .Release.Service }}
+    release: {{ .Release.Name }}
+spec:
+  type: {{ .Values.oap.manager.service.type }}
+  ports:
+  {{- range $key, $value :=  .Values.oap.manager.ports }}
+  - port: {{ $value }}
+    name: {{ $key }}
+  {{- end }}
+  selector:
+    app: {{ template "skywalking.name" . }}
+    component: "{{ .Values.oap.manager.name }}"
+    release: {{ .Release.Name }}
